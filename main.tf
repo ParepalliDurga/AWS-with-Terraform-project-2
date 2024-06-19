@@ -16,7 +16,7 @@ resource "aws_subnet" "sub2" {
   map_public_ip_on_launch = true #(optional)specify true to indicate that instances launched into the subnet should be assigned a publicIP adress.
 }
 
-resource "aws_internet_gateway" "igw" {
+resource "aws_internet_gateway" "igw" { #for internet should be passing via ec2 instance    
   vpc_id = aws_vpc.myvpc.id
 }
 
@@ -30,7 +30,7 @@ resource "aws_route_table" "RT" {
 }
 
 resource "aws_route_table_association" "rta1" {
-  subnet_id      = aws_subnet.sub1.id
+  subnet_id      = aws_subnet.sub1.id 
   route_table_id = aws_route_table.RT.id
 }
 
@@ -48,21 +48,21 @@ resource "aws_security_group" "webSg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #every one access
   }
   ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #every one access
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #every one access
   }
 
   tags = {
@@ -71,7 +71,7 @@ resource "aws_security_group" "webSg" {
 }
 
 resource "aws_s3_bucket" "example" {
-  bucket = "abhisheksterraform2023project"
+  bucket = "abhisheksterraform2023proje
 }
 
 
@@ -80,7 +80,7 @@ resource "aws_instance" "webserver1" {
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.webSg.id]
   subnet_id              = aws_subnet.sub1.id
-  user_data              = base64encode(file("userdata.sh"))
+  user_data              = base64encode(file("userdata.sh")) #bash script on aws Console
 }
 
 resource "aws_instance" "webserver2" {
