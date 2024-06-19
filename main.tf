@@ -29,12 +29,12 @@ resource "aws_route_table" "RT" {
   }
 }
 
-resource "aws_route_table_association" "rta1" {
+resource "aws_route_table_association" "rta1" { #for association
   subnet_id      = aws_subnet.sub1.id 
   route_table_id = aws_route_table.RT.id
 }
 
-resource "aws_route_table_association" "rta2" {
+resource "aws_route_table_association" "rta2" { #for association
   subnet_id      = aws_subnet.sub2.id
   route_table_id = aws_route_table.RT.id
 }
@@ -43,14 +43,14 @@ resource "aws_security_group" "webSg" {
   name   = "web"
   vpc_id = aws_vpc.myvpc.id
 
-  ingress {
+  ingress { #inbound
     description = "HTTP from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] #every one access
   }
-  ingress {
+  ingress { #inbound
     description = "SSH"
     from_port   = 22
     to_port     = 22
@@ -58,7 +58,7 @@ resource "aws_security_group" "webSg" {
     cidr_blocks = ["0.0.0.0/0"] #every one access
   }
 
-  egress {
+  egress { #outbound
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -95,9 +95,9 @@ resource "aws_instance" "webserver2" {
 resource "aws_lb" "myalb" {
   name               = "myalb"
   internal           = false
-  load_balancer_type = "application" #wecreate application loadbalancer
+  load_balancer_type = "application" #wecreate application load balancer
 
-  security_groups = [aws_security_group.webSg.id]
+  security_groups = [aws_security_group.webSg.id] 
   subnets         = [aws_subnet.sub1.id, aws_subnet.sub2.id]
 
   tags = {
@@ -117,19 +117,19 @@ resource "aws_lb_target_group" "tg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "attach1" {
+resource "aws_lb_target_group_attachment" "attach1" { #for attachment with Ec2 instances
   target_group_arn = aws_lb_target_group.tg.arn
   target_id        = aws_instance.webserver1.id #Ec2 instance-1
   port             = 80
 }
 
-resource "aws_lb_target_group_attachment" "attach2" {
+resource "aws_lb_target_group_attachment" "attach2" { #for attachment with Ec2 instances
   target_group_arn = aws_lb_target_group.tg.arn
   target_id        = aws_instance.webserver2.id #Ec2 instance-2
   port             = 80
 }
 
-resource "aws_lb_listener" "listener" { #ELB and target_group to listener each other
+resource "aws_lb_listener" "listener" { #ELB and target_group have to listener each other
   load_balancer_arn = aws_lb.myalb.arn
   port              = 80
   protocol          = "HTTP"
