@@ -95,7 +95,7 @@ resource "aws_instance" "webserver2" {
 resource "aws_lb" "myalb" {
   name               = "myalb"
   internal           = false
-  load_balancer_type = "application"
+  load_balancer_type = "application" #wecreate application loadbalancer
 
   security_groups = [aws_security_group.webSg.id]
   subnets         = [aws_subnet.sub1.id, aws_subnet.sub2.id]
@@ -112,29 +112,29 @@ resource "aws_lb_target_group" "tg" {
   vpc_id   = aws_vpc.myvpc.id
 
   health_check {
-    path = "/"
+    path = "/" #home path
     port = "traffic-port"
   }
 }
 
 resource "aws_lb_target_group_attachment" "attach1" {
   target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = aws_instance.webserver1.id
+  target_id        = aws_instance.webserver1.id #Ec2 instance-1
   port             = 80
 }
 
 resource "aws_lb_target_group_attachment" "attach2" {
   target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = aws_instance.webserver2.id
+  target_id        = aws_instance.webserver2.id #Ec2 instance-2
   port             = 80
 }
 
-resource "aws_lb_listener" "listener" {
+resource "aws_lb_listener" "listener" { #ELB and target_group to listener each other
   load_balancer_arn = aws_lb.myalb.arn
   port              = 80
   protocol          = "HTTP"
 
-  default_action {
+  default_action { #total action will move here
     target_group_arn = aws_lb_target_group.tg.arn
     type             = "forward"
   }
